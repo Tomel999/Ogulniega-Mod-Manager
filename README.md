@@ -2,7 +2,7 @@
 
 **Ogulniega Mod Manager** to prosta aplikacja desktopowa umożliwiająca pobieranie modów z platformy [Modrinth](https://modrinth.com) za pomocą interfejsu graficznego oraz dodająca możliwość wyłączenia lub włączenia wbudowanych modów w ogulniega client. Stworzona z wykorzystaniem Electron, HTML, CSS i JavaScript, aplikacja oferuje intuicyjny sposób na zarządzanie modami do Minecrafta.
 
-![Podgląd aplikacji](gif.gif)
+![Podgląd aplikacji](background/gif.gif)
 
 ## Funkcje
 
