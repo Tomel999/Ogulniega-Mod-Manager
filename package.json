@@ -1,0 +1,35 @@
+{
+  "name": "Ogulniega-Mod-Manager",
+  "version": "1.0.0",
+  "description": "uh ok?",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "Electron",
+    "Modrinth"
+  ],
+  "author": "tomel999",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "build": {
+    "appId": "com.tomel999.ogulniega-mod-manager",
+    "productName": "Ogulniega Mod Manager",
+    "icon": "icons/icon.ico",
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
