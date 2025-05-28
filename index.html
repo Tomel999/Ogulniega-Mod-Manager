@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://cdn.modrinth.com data:; connect-src 'self' https://api.modrinth.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.cdnfonts.com; font-src 'self' https://fonts.gstatic.com https://fonts.cdnfonts.com data:; img-src 'self' https://cdn.modrinth.com data: icons/; connect-src 'self' https://api.modrinth.com;">
     <title>Modrinth Downloader</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 </head>
 <body>
     <div id="animated-minecraft-bg">
@@ -19,7 +20,7 @@
     <div class="app-wrapper">
         <header class="app-header">
             <div class="logo-title">
-                <img src="icon.png" alt="App Logo" class="app-logo" onerror="this.style.display='none'">
+                <img src="icons/icon.png" alt="App Logo" class="app-logo" onerror="this.style.display='none'">
                 <h1>Modrinth Downloader</h1>
             </div>
             <div class="header-controls">
@@ -27,17 +28,19 @@
                     <span>Loader: <strong id="activeLoaderDisplay">Fabric</strong></span>
                 </div>
                 <div class="control-item">
-                    <span>Wersje MC: <strong id="activeMcVersionsDisplay">1.19.2-1.21.5</strong></span>
+                    <span>Wersje MC: <strong id="activeMcVersionsDisplay">Wczytywanie...</strong></span>
                 </div>
-            </div>
+                <button id="openVersionSelectionModalButton" class="btn btn-primary">Wybierz wersję MC</button>
+                </div>
         </header>
 
         <main class="main-content">
             <section class="search-area interactive-card">
-                <input type="text" id="modQuery" placeholder="Wpisz nazwę moda...">
-                <button id="searchButton" class="btn btn-primary">
+                <input type="text" id="modQuery" placeholder="Wybierz wersję MC, aby wyszukać mody..." disabled>
+                <button id="searchButton" class="btn btn-primary" disabled>
                     Szukaj
                 </button>
+                <button id="defaultModsButton" class="btn btn-blue">Domyślne mody</button>
             </section>
 
             <section class="status-area interactive-card" id="statusBar" style="display: none;">
@@ -52,12 +55,31 @@
 
             <section class="results-display">
                 <h2 id="resultsTitle" style="display:none;" class="section-title">Wyniki wyszukiwania</h2>
+                <div id="defaultModsFilterContainer" style="display:none;" class="default-mods-filter-container interactive-card">
+                    <input type="text" id="defaultModFilterQuery" class="input-field" placeholder="Filtruj wczytane domyślne mody...">
+                </div>
                 <div id="resultsArea" class="results-grid">
-                    </div>
+                </div>
             </section>
         </main>
     </div>
 
+    <div id="initialVersionSelectionModal" class="modal-overlay active">
+        <div class="modal-content interactive-card">
+            <div class="modal-header">
+                <h3 class="modal-title">Wybierz wersję Minecrafta</h3>
+            </div>
+            <div class="modal-body">
+                <p>Aby korzystać z aplikacji, wybierz wersję Minecrafta, dla której chcesz szukać modów.</p>
+                <br>
+                <select id="mcVersionSelect" class="input-field" disabled>
+                    <option value="">-- Wczytywanie wersji... --</option>
+                </select>
+                <br><br>
+                <button id="confirmInitialVersionButton" class="btn btn-primary" disabled>Zatwierdź wybór</button>
+            </div>
+        </div>
+    </div>
     <div id="versionModal" class="modal-overlay">
         <div class="modal-content interactive-card">
             <div class="modal-header">
@@ -66,7 +88,7 @@
             </div>
             <div class="modal-body">
                 <div id="modalVersionsList" class="versions-list-container">
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -96,6 +118,26 @@
             <div class="modal-footer">
                 <button id="cancelFolderButton" class="btn btn-secondary">Anuluj</button>
                 <button id="confirmFolderButton" class="btn btn-primary">Zatwierdź</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="preinstalledProfileSelectionModal" class="modal-overlay">
+        <div class="modal-content interactive-card">
+            <div class="modal-header">
+                <h3 class="modal-title">Wybierz profil dla domyślnych modów</h3>
+                <button class="btn-close" id="closePreinstalledProfileModalButton" aria-label="Zamknij">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Znaleziono wiele profili dla wersji MC <strong id="preinstalledModalMcVersion"></strong>. Wybierz, który profil sprawdzić:</p>
+                <br>
+                <select id="preinstalledProfileSelect" class="input-field">
+                </select>
+                <br><br>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelPreinstalledProfileButton" class="btn btn-secondary">Anuluj</button>
+                <button id="confirmPreinstalledProfileButton" class="btn btn-primary">Zatwierdź</button>
             </div>
         </div>
     </div>
