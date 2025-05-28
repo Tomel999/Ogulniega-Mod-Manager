@@ -155,7 +155,7 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
     }
 
     const response = await fetch(url, {
-        headers: { 'User-Agent': 'ElectronPureJSModrinthApp/1.9.8 (NativeHiddenAttribute)' }
+        headers: { 'User-Agent': 'ElectronPureJSModrinthApp/1.9.9 (DefaultModFilter)' }
     });
 
     if (!response.ok) {
@@ -219,14 +219,14 @@ async function checkWindowsHiddenAttribute(filePath) {
         if (pathStartIndex > 0) {
             const attributesPart = firstLine.substring(0, pathStartIndex).trim();
             return attributesPart.split(/\s+/).includes('H');
-        } else if (pathStartIndex === 0 && firstLine.length > filePath.length) {
+        } else if (pathStartIndex === 0 && firstLine.length > filePath.length) { 
              const attributesPart = firstLine.substring(0, firstLine.toUpperCase().indexOf(filePath.toUpperCase())).trim();
              return attributesPart.split(/\s+/).includes('H');
         }
-        return false;
+        return false; 
     } catch (e) {
         console.error(`[MainJS] Błąd sprawdzania atrybutu 'ukryty' dla ${filePath}: ${e.message}`);
-        return false;
+        return false; 
     }
 }
 
@@ -238,7 +238,7 @@ ipcMain.handle('get-preinstalled-mods', async (event, profileBasePath) => {
     const items = await fs.readdir(preinstalledFolderPath, { withFileTypes: true });
     
     const filesDataPromises = items
-      .filter(item => item.isFile())
+      .filter(item => item.isFile()) 
       .map(async item => {
         const fullPathToDiskName = path.join(preinstalledFolderPath, item.name);
         let isHidden = false;
@@ -249,16 +249,16 @@ ipcMain.handle('get-preinstalled-mods', async (event, profileBasePath) => {
             if (item.name.endsWith('.jar')) {
                 isHidden = await checkWindowsHiddenAttribute(fullPathToDiskName);
             } else {
-                return null;
+                return null; 
             }
-        } else {
+        } else { 
             if (item.name.startsWith('.') && item.name.endsWith('.jar')) {
                 isHidden = true;
-                displayName = item.name.substring(1);
+                displayName = item.name.substring(1); 
             } else if (item.name.endsWith('.jar')) {
                 isHidden = false;
             } else {
-                return null;
+                return null; 
             }
         }
         
@@ -311,7 +311,7 @@ ipcMain.handle('toggle-mod-state', async (event, currentFullPathToDiskName) => {
         await exec(command, { windowsHide: true });
         newStateIsDisabled = !isCurrentlyHidden;
         console.log(`[MainJS] Zmieniono atrybut ukrycia dla ${currentDiskName} (Windows). Nowy stan isDisabled: ${newStateIsDisabled}`);
-    } else {
+    } else { 
         if (currentDiskName.startsWith('.')) { 
             newDiskName = currentDiskName.substring(1);
             newStateIsDisabled = false;
@@ -330,7 +330,7 @@ ipcMain.handle('toggle-mod-state', async (event, currentFullPathToDiskName) => {
         }
     }
     
-    const profileBasePath = path.dirname(dirName);
+    const profileBasePath = path.dirname(dirName); 
     newRelativePath = path.relative(profileBasePath, newFullPath).replace(/\\/g, '/');
 
     return { 
