@@ -25,6 +25,7 @@ function createWindow () {
   });
 
   mainWindow.loadFile('index.html');
+  
 }
 
 app.whenReady().then(() => {
@@ -86,6 +87,7 @@ ipcMain.handle('get-profile-folders', async () => {
                         console.log(`[MainJS] Znaleziono podfolder-profil '${itemName}': ${itemFullPath}`);
                     }
                 } catch (e) {
+                  
                 }
             }
         } else {
@@ -152,6 +154,7 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
             return { success: false, error: 'Pobieranie anulowane przez użytkownika (plik istnieje).' };
         }
     } catch (e) {
+      
     }
 
     const response = await fetch(url, {
@@ -286,9 +289,28 @@ ipcMain.handle('get-preinstalled-mods', async (event, profileBasePath) => {
   }
 });
 
-ipcMain.on('show-item-in-folder', (event, filePath) => {
+ipcMain.on('show-item-in-folder', async (event, filePath) => {
     if (filePath) {
-        shell.showItemInFolder(filePath);
+        console.log(`[MainJS] Próba otwarcia/pokazania w folderze: ${filePath}`);
+        try {
+            const stats = await fs.stat(filePath);
+            if (stats.isFile()) {
+                shell.showItemInFolder(filePath);
+            } else if (stats.isDirectory()) {
+                const opened = shell.openPath(filePath);
+                if (!opened) {
+                    console.error(`[MainJS] Nie udało się otworzyć folderu ${filePath} za pomocą shell.openPath.`);
+                    shell.showItemInFolder(filePath);
+                }
+            } else {
+                 console.warn(`[MainJS] Ścieżka ${filePath} nie jest ani plikiem, ani folderem.`);
+            }
+        } catch (err) {
+            console.error(`[MainJS] Błąd podczas sprawdzania lub otwierania ścieżki ${filePath}:`, err);
+            dialog.showErrorBox('Błąd otwierania folderu', `Nie można otworzyć ścieżki: ${filePath}\nBłąd: ${err.message}`);
+        }
+    } else {
+        console.warn('[MainJS] Otrzymano pustą ścieżkę dla showItemInFolder.');
     }
 });
 

@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileFolderSelect = document.getElementById('profileFolderSelect');
     const customPathInput = document.getElementById('customPathInput');
     const browseFolderButton = document.getElementById('browseFolderButton');
+    const openSelectedFolderButton = document.getElementById('openSelectedFolderButton');
     const confirmFolderButton = document.getElementById('confirmFolderButton');
     const cancelFolderButton = document.getElementById('cancelFolderButton');
     const closeFolderModalButton = document.getElementById('closeFolderModalButton');
@@ -400,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isPerfectMatch = Array.isArray(version.game_versions) && version.game_versions.some(gv => targetMcVersions.includes(gv));
             const isFirstPerfectMatch = isPerfectMatch && filteredVersions.findIndex(fv => fv.id === version.id) === 0;
-            const recommendedLabel = isFirstPerfectMatch ? '<div class="recommended-label" style="color:#4caf50;font-weight:bold;margin-top:4px;">Zalecana dla wybranej wersji MC</div>' : '';
+            const recommendedLabel = isFirstPerfectMatch ? '<div class="recommended-label">Zalecana dla wybranej wersji MC</div>' : '';
             const buttonClass = isFirstPerfectMatch ? 'btn-download-version-top' : 'btn-download-version-secondary';
 
             item.innerHTML = `
@@ -435,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
 
     async function openFolderSelectionModal(filenameToDownload) {
         folderModalFilename.textContent = filenameToDownload;
@@ -512,6 +514,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(error) {
             console.error("Błąd podczas przeglądania folderów:", error);
             window.electronAPI.showErrorMessage({ title: "Błąd Przeglądania", content: "Nie udało się otworzyć okna wyboru folderu." });
+        }
+    });
+
+    openSelectedFolderButton.addEventListener('click', () => {
+        let targetPath = profileFolderSelect.value;
+
+        if (!targetPath) {
+            targetPath = customPathInput.value.trim();
+        }
+        
+        if (targetPath) {
+            console.log('[RendererJS] Próba otwarcia folderu (z przycisku w modalu):', targetPath);
+            window.electronAPI.showItemInFolder(targetPath);
+        } else {
+            window.electronAPI.showErrorMessage({ title: "Brak ścieżki", content: "Proszę najpierw wybrać profil lub wprowadzić ścieżkę do folderu." });
         }
     });
 
