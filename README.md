@@ -6,7 +6,7 @@
 
 ## Funkcje
 
-- **Wyszukiwanie modów**: Przeszukuj bazę modów dostępnych na Modrinth.
+- **Wyszukiwanie modów**: Przeszukuj bazę modów dostępnych na Modrinth oraz Curseforge.
 - **Pobieranie modów**: Pobieraj wybrane mody bezpośrednio na swój komputer.
 - **Przyjazny interfejs**: Korzystaj z prostego i intuicyjnego interfejsu użytkownika.
 - **Edycja wbudowanych modów**: Możesz juz teraz wyłączyc mody w ogulniedze, których nie chcesz mieć.
