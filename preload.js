@@ -1,7 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+    searchCurseforge: (args) => ipcRenderer.invoke('search-curseforge', args),
+    getModFilesCurseforge: (args) => ipcRenderer.invoke('get-mod-files-curseforge', args),
     getProfileFolders: () => ipcRenderer.invoke('get-profile-folders'),
+    getShaderPath: () => ipcRenderer.invoke('get-shader-path'),
     browseForDirectory: () => ipcRenderer.invoke('browse-for-directory'),
     downloadFile: (args) => ipcRenderer.invoke('download-file', args),
     getPreinstalledMods: (profilePath) => ipcRenderer.invoke('get-preinstalled-mods', profilePath),

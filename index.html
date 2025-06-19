@@ -4,43 +4,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.cdnfonts.com; font-src 'self' https://fonts.gstatic.com https://fonts.cdnfonts.com data:; img-src 'self' https://cdn.modrinth.com data: icons/; connect-src 'self' https://api.modrinth.com;">
-    <title>Modrinth Downloader</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https://cdn.modrinth.com https://media.forgecdn.net data: icons/; connect-src 'self' https://api.modrinth.com https://api.curseforge.com;">
+    <title>Ogulniega Mod Manager</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/minecraft-3" rel="stylesheet">
 </head>
 <body>
-    <div id="animated-minecraft-bg">
-        <div class="bg-layer layer-1"></div>
-        <div class="bg-layer layer-2"></div>
-        <div class="bg-layer layer-3"></div>
+    <div id="animated-background"></div>
+
+    <div id="landingPage" class="landing-container">
+        <div class="landing-content">
+            <img src="icons/icon.ico" alt="App Logo" class="landing-logo">
+            <h1 class="landing-title">Ogulniega Mod Manager</h1>
+            <p class="landing-subtitle">Wybierz platformę do pobierania modów lub zarządzaj lokalnymi plikami.</p>
+            <div class="platform-choice">
+                <button id="selectModrinth" class="btn-platform">
+                    <img src="icons/modrinth.svg" alt="Modrinth" onerror="this.style.display='none'">
+                    <span>Modrinth</span>
+                </button>
+                <button id="selectCurseForge" class="btn-platform">
+                    <img src="icons/curseforge.svg" alt="CurseForge" onerror="this.style.display='none'">
+                    <span>CurseForge</span>
+                </button>
+                <button id="defaultModsButton" class="btn-platform">
+                    <img src="icons/Folder.svg" alt="Domyślne Mody" onerror="this.style.display='none'">
+                    <span>Domyślne</span>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="app-wrapper">
+    <div class="app-wrapper hidden">
         <header class="app-header">
             <div class="logo-title">
-                <img src="icons/icon.ico" alt="App Logo" class="app-logo" onerror="this.style.display='none'">
-                <h1>Modrinth Downloader</h1>
+                <button id="backToMenuBtn" class="btn btn-secondary" title="Powrót do wyboru platformy">‹ Menu</button>
+                <h1 id="appTitle">Mod Manager</h1>
             </div>
             <div class="header-controls">
                 <div class="control-item">
+                    <span>Typ:</span>
+                    <select id="categorySelect" class="input-field header-select">
+                        <option value="mod" selected>Mody</option>
+                        <option value="shader">Shadery</option>
+                    </select>
+                </div>
+                <div class="control-item" id="loaderControlItem">
                     <span>Loader: <strong id="activeLoaderDisplay">Fabric</strong></span>
                 </div>
-                <div class="control-item">
-                    <span>Wersje MC: <strong id="activeMcVersionsDisplay">Wczytywanie...</strong></span>
+                <div id="mcVersionControlContainer">
+                    <div class="control-item">
+                        <span>Wersje MC: <strong id="activeMcVersionsDisplay">Wczytywanie...</strong></span>
+                    </div>
+                    <button id="openVersionSelectionModalButton" class="btn btn-secondary">Zmień wersję MC</button>
                 </div>
-                <button id="openVersionSelectionModalButton" class="btn btn-primary">Wybierz wersję MC</button>
-                </div>
+            </div>
         </header>
 
         <main class="main-content">
-            <section class="search-area interactive-card">
+            <section id="searchArea" class="search-area interactive-card">
                 <input type="text" id="modQuery" placeholder="Wybierz wersję MC, aby wyszukać mody..." disabled>
                 <button id="searchButton" class="btn btn-primary" disabled>
                     Szukaj
                 </button>
-                <button id="defaultModsButton" class="btn btn-blue">Domyślne mody</button>
             </section>
 
             <section class="status-area interactive-card" id="statusBar" style="display: none;">
@@ -54,7 +79,7 @@
             </section>
 
             <section class="results-display">
-                <h2 id="resultsTitle" style="display:none;" class="section-title">Wyniki wyszukiwania</h2>
+                <h2 id="resultsTitle" style="display:none;" class="section-title">Wyniki</h2>
                 <div id="defaultModsFilterContainer" style="display:none;" class="default-mods-filter-container interactive-card">
                     <input type="text" id="defaultModFilterQuery" class="input-field" placeholder="Filtruj wczytane domyślne mody...">
                 </div>
@@ -63,14 +88,13 @@
             </section>
         </main>
     </div>
-
-    <div id="initialVersionSelectionModal" class="modal-overlay active">
-        <div class="modal-content interactive-card">
+    <div id="initialVersionSelectionModal" class="modal-overlay">
+        <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Wybierz wersję Minecrafta</h3>
+                <h3 id="initialModalTitle" class="modal-title">Wybierz wersję Minecrafta</h3>
             </div>
             <div class="modal-body">
-                <p>Aby korzystać z aplikacji, wybierz wersję Minecrafta, dla której chcesz szukać modów.</p>
+                <p id="initialModalText">Aby korzystać z aplikacji, wybierz wersję Minecrafta.</p>
                 <br>
                 <select id="mcVersionSelect" class="input-field" disabled>
                     <option value="">-- Wczytywanie wersji... --</option>
@@ -81,40 +105,30 @@
         </div>
     </div>
     <div id="versionModal" class="modal-overlay">
-        <div class="modal-content interactive-card">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalModTitle" class="modal-title">Wybierz wersję</h3>
-                <button class="btn-close" id="closeVersionModalButton" aria-label="Zamknij">&times;</button>
+                <button class="btn-close" id="closeVersionModalButton" aria-label="Zamknij">×</button>
             </div>
             <div class="modal-body">
-                <div id="modalVersionsList" class="versions-list-container">
-                </div>
+                <div id="modalVersionsList" class="versions-list-container"></div>
             </div>
         </div>
     </div>
-
     <div id="folderSelectionModal" class="modal-overlay">
-        <div class="modal-content interactive-card">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="folderModalTitle" class="modal-title">Wybierz folder dla: <span id="folderModalFilename" class="filename-highlight">plik.jar</span></h3>
-                <button class="btn-close" id="closeFolderModalButton" aria-label="Zamknij">&times;</button>
+                <button class="btn-close" id="closeFolderModalButton" aria-label="Zamknij">×</button>
             </div>
             <div class="modal-body">
                 <div class="folder-selection-ui">
-                    <div class="form-group">
-                        <label for="profileFolderSelect">Wybierz profil:</label>
-                        <select id="profileFolderSelect" class="input-field">
-                            <option value="">-- Ręcznie / Przeglądaj --</option>
-                            </select>
-                    </div>
                     <div class="form-group">
                         <label for="customPathInput">Folder docelowy:</label>
                         <div class="path-input-group">
                             <input type="text" id="customPathInput" class="input-field" placeholder="Wprowadź lub wybierz ścieżkę...">
                             <button id="browseFolderButton" class="btn btn-secondary">Przeglądaj</button>
-                            <button id="openSelectedFolderButton" class="btn btn-icon" title="Otwórz wybrany folder">
-                                <span class="folder-icon">📁</span>
-                            </button>
+                            <button id="openSelectedFolderButton" class="btn btn-secondary" title="Otwórz wybrany folder"><span class="folder-icon">📁</span></button>
                         </div>
                     </div>
                 </div>
@@ -125,23 +139,21 @@
             </div>
         </div>
     </div>
-
-    <div id="preinstalledProfileSelectionModal" class="modal-overlay">
-        <div class="modal-content interactive-card">
+    <div id="profileChoiceModal" class="modal-overlay">
+        <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Wybierz profil dla domyślnych modów</h3>
-                <button class="btn-close" id="closePreinstalledProfileModalButton" aria-label="Zamknij">&times;</button>
+                <h3 class="modal-title" id="profileChoiceModalTitle">Wybierz profil</h3>
+                <button class="btn-close" id="closeProfileChoiceModalButton" aria-label="Zamknij">×</button>
             </div>
             <div class="modal-body">
-                <p>Znaleziono wiele profili dla wersji MC <strong id="preinstalledModalMcVersion"></strong>. Wybierz, który profil sprawdzić:</p>
+                <p>Znaleziono wiele profili dla wersji MC <strong id="profileChoiceModalMcVersion"></strong>. Wybierz, który profil chcesz użyć:</p>
                 <br>
-                <select id="preinstalledProfileSelect" class="input-field">
-                </select>
+                <select id="profileChoiceSelect" class="input-field"></select>
                 <br><br>
             </div>
             <div class="modal-footer">
-                <button id="cancelPreinstalledProfileButton" class="btn btn-secondary">Anuluj</button>
-                <button id="confirmPreinstalledProfileButton" class="btn btn-primary">Zatwierdź</button>
+                <button id="cancelProfileChoiceButton" class="btn btn-secondary">Anuluj</button>
+                <button id="confirmProfileChoiceButton" class="btn btn-primary">Zatwierdź</button>
             </div>
         </div>
     </div>
