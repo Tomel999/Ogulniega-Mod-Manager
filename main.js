@@ -6,7 +6,7 @@ const { pipeline } = require('stream/promises');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const CURSEFORGE_API_KEY = '$2a$10$suGfyxYXJfby9Om425Tds.ABOUJDyZ1hkCJZXIIn6LkbqLGnd4jey';
+const CURSEFORGE_API_KEY = 'YOUR CURSEFORGE API KEY HERE';
 const CURSEFORGE_API_URL = 'https://api.curseforge.com';
 const MINECRAFT_GAME_ID = 432;
 const MODS_CLASS_ID = 6;

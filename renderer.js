@@ -65,15 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const CURSEFORGE_MOD_CLASS_ID = 6;
   const CURSEFORGE_SHADER_CLASS_ID = 6552;
 
-  // Handler dla błędów ładowania obrazków
   function handleImageError(event) {
     console.warn(`Nie udało się załadować obrazu: ${event.target.src}. Ukrywam element.`);
     event.target.style.display = 'none';
-    // Można też ustawić obrazek zastępczy:
-    // event.target.src = 'path/to/fallback-image.png';
+
   }
 
-  // Dodanie error handlerów do obrazków na stronie powitalnej
   const landingLogo = document.querySelector('.landing-logo');
   if (landingLogo) {
     landingLogo.addEventListener('error', handleImageError);
@@ -81,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('.platform-choice-icon').forEach(img => {
     img.addEventListener('error', handleImageError);
   });
-
 
   function initializeForService(serviceName) {
       currentService = serviceName;
@@ -296,18 +292,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const category = categorySelect.value;
 
       const modIcon = document.createElement('img');
-      modIcon.src = modData.iconUrl || 'icons/jar.png'; // Ustawia src, domyślnie jar.png jeśli iconUrl jest null/undefined
+      modIcon.src = modData.iconUrl || 'icons/jar.png';
       modIcon.alt = modData.title;
       modIcon.className = 'mod-icon';
-      modIcon.onerror = function() { // Handler błędu ładowania ikony moda
-          this.onerror = null; // Zapobiega pętli błędów, jeśli ikona zastępcza też się nie załaduje
-          this.src = 'icons/jar.png'; // Ścieżka do lokalnej ikony zastępczej
+      modIcon.onerror = function() {
+          this.onerror = null;
+          this.src = 'icons/jar.png';
           console.warn(`Nie udało się załadować ikony dla moda: ${modData.title} z ${modData.iconUrl}. Używam domyślnej ikony (jar.png).`);
       };
-      
+
       const headerDiv = document.createElement('div');
       headerDiv.className = 'mod-card-header';
-      headerDiv.appendChild(modIcon); // Dodaj obrazek jako pierwszy
+      headerDiv.appendChild(modIcon);
 
       const titleAuthorDiv = document.createElement('div');
       titleAuthorDiv.className = 'mod-title-author';
@@ -318,10 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       modCard.appendChild(headerDiv);
 
-      // Reszta karty moda - UWAGA: użycie innerHTML += czyści istniejące event listenery,
-      // ale tutaj obrazek jest już dodany, więc jego listener 'onerror' pozostanie.
-      // Lepiej by było tworzyć wszystkie elementy za pomocą createElement i appendChild,
-      // ale dla uproszczenia pozostawiam tak, jak było częściowo wcześniej.
       const bodyAndActionsHTML = `
           <div class="mod-card-body">
               <p class="mod-summary">${modData.summary}</p>
@@ -335,15 +327,13 @@ document.addEventListener("DOMContentLoaded", () => {
                   Pobierz / Wersje
               </button>
           </div>`;
-      
-      const tempDiv = document.createElement('div'); // Tworzymy tymczasowy div, aby sparsować HTML
+
+      const tempDiv = document.createElement('div');
       tempDiv.innerHTML = bodyAndActionsHTML;
-      
-      // Dodajemy elementy z tymczasowego diva do modCard
+
       while (tempDiv.firstChild) {
           modCard.appendChild(tempDiv.firstChild);
       }
-
 
       modCard.querySelector('button').addEventListener('click', (e) => {
           const { modId, modTitle, category } = e.currentTarget.dataset;
