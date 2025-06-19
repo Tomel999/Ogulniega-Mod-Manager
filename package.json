@@ -24,6 +24,10 @@
   "build": {
     "appId": "com.tomel999.ogulniega-mod-manager",
     "productName": "Ogulniega Mod Manager",
+    "files": [
+    "**/*"
+    ],
+    "asar": true,
     "icon": "icons/icon.ico",
     "win": {
       "target": "nsis"

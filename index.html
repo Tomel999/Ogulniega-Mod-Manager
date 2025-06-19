@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https://cdn.modrinth.com https://media.forgecdn.net data: icons/; connect-src 'self' https://api.modrinth.com https://api.curseforge.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https://cdn.modrinth.com https://media.forgecdn.net data:; connect-src 'self' https://api.modrinth.com https://api.curseforge.com;">
     <title>Ogulniega Mod Manager</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,15 +19,15 @@
             <p class="landing-subtitle">Wybierz platformę do pobierania modów lub zarządzaj lokalnymi plikami.</p>
             <div class="platform-choice">
                 <button id="selectModrinth" class="btn-platform">
-                    <img src="icons/modrinth.svg" alt="Modrinth" onerror="this.style.display='none'">
+                    <img src="icons/modrinth.svg" alt="Modrinth" class="platform-choice-icon">
                     <span>Modrinth</span>
                 </button>
                 <button id="selectCurseForge" class="btn-platform">
-                    <img src="icons/curseforge.svg" alt="CurseForge" onerror="this.style.display='none'">
+                    <img src="icons/curseforge.svg" alt="CurseForge" class="platform-choice-icon">
                     <span>CurseForge</span>
                 </button>
                 <button id="defaultModsButton" class="btn-platform">
-                    <img src="icons/Folder.svg" alt="Domyślne Mody" onerror="this.style.display='none'">
+                    <img src="icons/Folder.svg" alt="Domyślne Mody" class="platform-choice-icon">
                     <span>Domyślne</span>
                 </button>
             </div>
