@@ -580,7 +580,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const modCard = button.closest('.local-mod-card');
             const statusText = modCard.querySelector('.mod-title-author p');
 
-            // Zablokuj przycisk na czas operacji
             button.disabled = true;
             button.textContent = 'Zmieniam...';
 
@@ -589,15 +588,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.success) {
                 const isEnabled = !result.isDisabled;
                 
-                // Zaktualizuj atrybut ścieżki, jeśli się zmieniła (dla systemów innych niż Windows)
                 button.dataset.path = result.newPath;
 
-                // Zaktualizuj wygląd przycisku
                 button.textContent = isEnabled ? "Włączony" : "Wyłączony";
                 button.classList.toggle('btn-primary', isEnabled);
                 button.classList.toggle('btn-danger-state', !isEnabled);
 
-                // Zaktualizuj tekst statusu
                 if (statusText) {
                     statusText.textContent = `Plik lokalny (${ isEnabled ? "Włączony" : "Wyłączony" })`;
                 }
@@ -605,12 +601,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 showStatus(`Zmieniono stan moda: ${modCard.querySelector('h3').textContent}`, 'success');
             } else {
                 showStatus(`Błąd: ${result.error}`, 'error');
-                // Przywróć poprzedni stan przycisku w razie błędu
                 const wasEnabled = button.classList.contains('btn-primary');
                 button.textContent = wasEnabled ? "Włączony" : "Wyłączony";
             }
             
-            // Odblokuj przycisk po zakończeniu operacji
             button.disabled = false;
         });
     });
@@ -768,8 +762,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.electronAPI.removeAllDownloadListeners();
   });
 
-  // ===== MODS PROFILE FUNCTIONALITY =====
-  
   const modsProfileModal = document.getElementById('modsProfileModal');
   const closeModsProfileModalButton = document.getElementById('closeModsProfileModalButton');
   const githubRepoInput = document.getElementById('githubRepoInput');
@@ -789,13 +781,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadLocationInfo = document.getElementById('downloadLocationInfo');
   const targetFolderDisplay = document.getElementById('targetFolderDisplay');
   
-  // New elements for mod list preview
   const profileModsListContainer = document.getElementById('profileModsListContainer');
   const profileModsPreview = document.getElementById('profileModsPreview');
   const downloadSelectedModsButton = document.getElementById('downloadSelectedModsButton');
   const backToProfilesButton = document.getElementById('backToProfilesButton');
-  
-  // Mod selection controls
+
   const selectedModsCount = document.getElementById('selectedModsCount');
   const totalModsCount = document.getElementById('totalModsCount');
   const selectAllModsButton = document.getElementById('selectAllModsButton');
@@ -805,7 +795,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentProfile = null;
 
   async function openModsProfileModal() {
-    // Load MC versions if not already loaded
     if (availableMcVersions.length === 0) {
       try {
         const profileData = await window.electronAPI.getProfileFolders();
@@ -816,7 +805,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    // Populate MC versions - only from available profiles
     minecraftVersionProfile.innerHTML = '<option value="">-- Wybierz wersję MC --</option>';
     
     if (availableMcVersions.length > 0) {
@@ -830,7 +818,6 @@ document.addEventListener("DOMContentLoaded", () => {
       minecraftVersionProfile.appendChild(option);
     }
     
-    // Set default repo if empty
     if (!githubRepoInput.value) {
       githubRepoInput.value = 'Tomel999/mod-profiles';
     }
@@ -846,11 +833,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     
-    // Get profiles for this version
     const profilesForVersion = groupedProfileFolders[selectedVersion] || [];
     
     if (profilesForVersion.length > 1) {
-      // Multiple profiles - show selection
       profileSelectionGroup.style.display = 'block';
       profileFolderSelect.innerHTML = '<option value="">-- Wybierz profil --</option>';
       
@@ -859,10 +844,8 @@ document.addEventListener("DOMContentLoaded", () => {
         profileFolderSelect.appendChild(option);
       });
     } else if (profilesForVersion.length === 1) {
-      // Single profile - auto-select and hide selection
       profileSelectionGroup.style.display = 'none';
     } else {
-      // No profiles found
       profileSelectionGroup.style.display = 'none';
     }
   }
@@ -881,7 +864,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     
-    // Check if we need to select a profile folder
     const profilesForVersion = groupedProfileFolders[mcVersion] || [];
     if (profilesForVersion.length > 1 && !profileFolderSelect.value) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Wybierz profil dla tej wersji MC!" });
@@ -898,7 +880,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProfilesButton.textContent = 'Ładowanie...';
     
     try {
-      // First, get the contents of the MC version folder
       const result = await window.electronAPI.fetchGithubRepoContents({ owner, repo, path: mcVersion });
       
       if (!result.success) {
@@ -907,7 +888,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const contents = result.data;
       
-      // Filter for JSON files
       const jsonFiles = contents.filter(item => 
         item.type === 'file' && item.name.endsWith('.json')
       );
@@ -935,7 +915,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const profileCard = document.createElement('div');
       profileCard.className = 'profile-card';
       
-      // Extract profile name from filename (remove .json extension)
       const profileName = file.name.replace('.json', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       
       profileCard.innerHTML = `
@@ -953,7 +932,6 @@ document.addEventListener("DOMContentLoaded", () => {
       profilesList.appendChild(profileCard);
     });
 
-    // Add event listeners to load profile buttons
     document.querySelectorAll('.load-profile-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const fileData = JSON.parse(e.target.dataset.file);
@@ -964,11 +942,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function showProfileModsList(fileData) {
     try {
-      // Hide profiles list and show mods list container
       profilesListContainer.style.display = 'none';
       profileModsListContainer.style.display = 'block';
       
-      // Reset the preview area
       profileModsPreview.innerHTML = `
         <div class="mods-loading" style="text-align: center; padding: 20px;">
           <div class="loader"></div>
@@ -976,7 +952,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
       
-      // Download the JSON file content
       const result = await window.electronAPI.fetchGithubFile({ 
         owner: fileData.owner,
         repo: fileData.repo,
@@ -999,7 +974,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Create header with profile info
       const profileHeader = document.createElement('div');
       profileHeader.className = 'profile-header';
       profileHeader.innerHTML = `
@@ -1014,26 +988,22 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-      // Create mods container
       const modsContainer = document.createElement('div');
       modsContainer.className = 'mods-preview-container';
       
-      // Clear loading and add header
       profileModsPreview.innerHTML = '';
       profileModsPreview.appendChild(profileHeader);
       profileModsPreview.appendChild(modsContainer);
       
-      // Fetch and display mod information
       for (let index = 0; index < modIds.length; index++) {
         const modId = modIds[index];
         
         try {
-          // Get mod info from Modrinth using ID
           const projectResult = await window.electronAPI.fetchModrinthProject({ projectId: modId });
           
           let modInfo = {
             id: modId,
-            name: modId, // fallback to ID
+            name: modId,
             description: 'Brak opisu',
             iconUrl: null,
             downloads: 0,
@@ -1048,7 +1018,6 @@ document.addEventListener("DOMContentLoaded", () => {
             modInfo.categories = projectResult.data.categories || [];
           }
           
-          // Create mod preview item with checkbox
           const modPreviewItem = document.createElement('div');
           modPreviewItem.className = 'mod-preview-item';
           modPreviewItem.innerHTML = `
@@ -1076,8 +1045,7 @@ document.addEventListener("DOMContentLoaded", () => {
           
         } catch (error) {
           console.error(`Błąd pobierania informacji o modzie ${modId}:`, error);
-          
-          // Create mod item with error state and checkbox
+
           const modPreviewItem = document.createElement('div');
           modPreviewItem.className = 'mod-preview-item error';
           modPreviewItem.innerHTML = `
@@ -1104,7 +1072,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       
-      // Store profile data for later use and show controls
       currentProfile = {
         ...profileData,
         name: profileData.name || fileData.name.replace('.json', ''),
@@ -1113,12 +1080,10 @@ document.addEventListener("DOMContentLoaded", () => {
         fileData: fileData
       };
       
-      // Show selection controls and update counts
       modSelectionControls.style.display = 'block';
       downloadSelectedModsButton.style.display = 'inline-block';
       updateSelectedModsCount();
       
-      // Add event listeners to checkboxes
       setupModCheckboxListeners();
       
     } catch (error) {
@@ -1138,7 +1103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedModsCount.textContent = selectedCheckboxes.length;
     totalModsCount.textContent = checkboxes.length;
     
-    // Update button state
     if (selectedCheckboxes.length > 0) {
       downloadSelectedModsButton.disabled = false;
       downloadSelectedModsButton.textContent = `Pobierz Zaznaczone Mody (${selectedCheckboxes.length})`;
@@ -1182,7 +1146,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadProfileDetails(fileData) {
     try {
-      // Download the JSON file content
       const result = await window.electronAPI.fetchGithubFile({ 
         owner: fileData.owner,
         repo: fileData.repo,
@@ -1195,7 +1158,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const profileData = JSON.parse(result.data);
       
-      // Extract profile name from filename
       const profileName = fileData.name.replace('.json', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       
       currentProfile = {
