@@ -175,6 +175,7 @@ ipcMain.handle('get-shader-path', async () => {
 });
 
 ipcMain.handle('browse-for-directory', async () => {
+
   const basePath = os.platform() === 'win32' && process.env.APPDATA
       ? process.env.APPDATA
       : os.homedir();
@@ -192,6 +193,7 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 
     try {
         await fs.access(fullPath);
+
         console.log(`[MainJS] Plik ${filename} już istnieje - nadpisywanie...`);
     } catch (e) {  }
 
@@ -219,10 +221,12 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 });
 
 ipcMain.on('show-error-message', (event, { title, content }) => {
+
     console.error(`[MainJS] ${title || 'Błąd'}: ${content || 'Wystąpił nieznany błąd.'}`);
 });
 
 ipcMain.on('show-info-message', (event, { title, content }) => {
+
     console.log(`[MainJS] ${title || 'Informacja'}: ${content || ''}`);
 });
 
@@ -230,6 +234,7 @@ async function checkWindowsHiddenAttribute(filePath) {
     if (os.platform() !== 'win32') return false;
     try {
         const { stdout } = await exec(`attrib "${filePath}"`, { windowsHide: true });
+
         return stdout.substring(0, 12).toUpperCase().includes('H');
     } catch (e) {
         console.error(`[MainJS] Błąd sprawdzania atrybutu 'ukryty': ${e.message}`);
@@ -307,16 +312,16 @@ ipcMain.handle('fetch-github-repo-contents', async (event, { owner, repo, path =
 
   try {
     const response = await fetch(url, {
-      headers: { 
+      headers: {
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'OgulniegaModManager/2.0'
       }
     });
-    
+
     if (!response.ok) {
       throw new Error(`GitHub API Error (${response.status}): ${response.statusText}`);
     }
-    
+
     const contents = await response.json();
     return { success: true, data: contents };
   } catch (error) {
@@ -335,11 +340,11 @@ ipcMain.handle('fetch-github-file', async (event, { owner, repo, path }) => {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Nie udało się pobrać pliku: ${response.statusText}`);
     }
-    
+
     const content = await response.text();
     return { success: true, data: content };
   } catch (error) {
@@ -358,11 +363,11 @@ ipcMain.handle('fetch-modrinth-project', async (event, { projectId }) => {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Modrinth API Error (${response.status}): ${response.statusText}`);
     }
-    
+
     const project = await response.json();
     return { success: true, data: project };
   } catch (error) {
@@ -377,18 +382,18 @@ ipcMain.handle('fetch-modrinth-project-versions', async (event, { projectId, gam
   const loaders = JSON.stringify([loader || 'fabric']);
   const game_versions = JSON.stringify([gameVersion]);
   const url = `https://api.modrinth.com/v2/project/${projectId}/version?loaders=${loaders}&game_versions=${game_versions}`;
-  
+
   console.log(`[MainJS] Pobieranie wersji projektu z Modrinth: ${url}`);
 
   try {
     const response = await fetch(url, {
       headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
     });
-    
+
     if (!response.ok) {
       throw new Error(`Modrinth API Error (${response.status}): ${response.statusText}`);
     }
-    
+
     const versions = await response.json();
     return { success: true, data: versions };
   } catch (error) {
