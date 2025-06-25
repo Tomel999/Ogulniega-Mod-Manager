@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ogulniega Mod Profile Template Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-bg-dark: #4B3414;
+            --theme-surface: #6E4C1E;
+            --theme-surface-light: #805E2F;
+            --theme-border: #3A2810;
+            --theme-border-light: #805E2F;
+            --theme-text-primary: #FDF6E3;
+            --theme-text-dim: #DDC9A3;
+            --theme-text-title: #FFFFFF;
+            --theme-accent-yellow: #FFD653;
+            --theme-accent-yellow-hover: #EEB238;
+            --theme-accent-gold: #DDB65D;
+            --theme-accent-gold-hover: #C5A152;
+            --theme-success: #7FB069;
+            --theme-warning: #FF9800;
+            --theme-danger: #D9534F;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --shadow-glow: 0 0 12px rgba(255, 214, 83, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pixelify Sans', sans-serif;
+            background: var(--theme-bg-dark);
+            color: var(--theme-text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--theme-surface);
+            border-radius: 15px;
+            border: 2px solid var(--theme-border-light);
+            box-shadow: var(--shadow-glow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--theme-surface-light);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid var(--theme-border-light);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--theme-text-title);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--theme-text-dim);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .form-section {
+            background: var(--theme-surface-light);
+            padding: 25px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--theme-border-light);
+        }
+
+        .form-section h2 {
+            color: var(--theme-accent-yellow);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--theme-text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--theme-bg-dark);
+            border: 2px solid var(--theme-border);
+            border-radius: var(--border-radius-sm);
+            color: var(--theme-text-primary);
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--theme-accent-yellow);
+            box-shadow: 0 0 8px rgba(255, 214, 83, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .mod-list-section {
+            margin-top: 20px;
+        }
+
+        .mod-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .mod-input-group input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: var(--theme-accent-yellow);
+            color: var(--theme-bg-dark);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--theme-accent-yellow-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background: var(--theme-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c9302c;
+        }
+
+        .btn-success {
+            background: var(--theme-success);
+            color: white;
+        }
+
+        .output-section {
+            background: var(--theme-bg-dark);
+            padding: 25px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--theme-border-light);
+        }
+
+        .output-section h2 {
+            color: var(--theme-accent-gold);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        #jsonOutput {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--theme-border);
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            background: var(--theme-accent-gold);
+            color: var(--theme-bg-dark);
+        }
+
+        .btn-preset:hover {
+            background: var(--theme-accent-gold-hover);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .mod-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Mod Profile Template Generator</h1>
+            <p>Stwórz szablon profilu modów dla Ogulniega Mod Manager</p>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <h2>📝 Informacje o profilu</h2>
+                
+                <div class="preset-buttons">
+                    <button class="btn btn-preset btn-small" onclick="loadPreset('empty')">Pusty szablon</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="profileName">Nazwa profilu:</label>
+                    <input type="text" id="profileName" placeholder="np. Crystal PvP">
+                </div>
+
+                <div class="form-group">
+                    <label for="profileDescription">Opis:</label>
+                    <textarea id="profileDescription" placeholder="Krótki opis profilu modów"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="profileVersion">Wersja profilu:</label>
+                    <input type="text" id="profileVersion" value="1.0.0" placeholder="1.0.0">
+                </div>
+
+                <div class="form-group">
+                    <label for="mcVersion">Wersja Minecraft:</label>
+                    <select id="mcVersion">
+                        <option value="">Wybierz wersję</option>
+                        <option value="1.21.1">1.21.6</option>
+                        <option value="1.21.1">1.21.5</option>
+                        <option value="1.21.1">1.21.4</option>
+                        <option value="1.21.1">1.21.3</option>
+                        <option value="1.21">1.21.1</option>
+                        <option value="1.20.6">1.20.6</option>
+                        <option value="1.20.1">1.20.1</option>
+                        <option value="1.19.2">1.19.2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="loader">Mod Loader:</label>
+                    <input type="text" id="loader" value="fabric" readonly style="background: var(--theme-surface); cursor: not-allowed; opacity: 0.7;">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Autor:</label>
+                    <input type="text" id="author" placeholder="Twoja nazwa">
+                </div>
+
+                <div class="mod-list-section">
+                    <h3 style="color: var(--theme-accent-yellow); margin-bottom: 15px;">🔧 Mody</h3>
+                    <div id="modsList">
+                        <div class="mod-input-group">
+                            <input type="text" placeholder="ID moda (np. AANobbMI)" class="mod-id-input">
+                            <button class="btn btn-danger btn-small" onclick="removeMod(this)">Usuń</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-small" onclick="addMod()">+ Dodaj mod</button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h2>📄 Wygenerowany JSON</h2>
+                <div id="jsonOutput">Wypełnij formularz aby wygenerować szablon...</div>
+                
+                <div class="actions">
+                    <button class="btn" onclick="generateTemplate()">🔄 Odśwież szablon</button>
+                    <button class="btn btn-success" onclick="copyToClipboard()">📋 Kopiuj JSON</button>
+                    <button class="btn btn-success" onclick="downloadTemplate()">💾 Pobierz plik</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Predefiniowane szablony
+        const presets = {
+            empty: {
+                name: "",
+                description: "",
+                version: "1.0.0",
+                mcVersion: "",
+                loader: "fabric",
+                author: "",
+                modIds: []
+            }
+        };
+
+        function loadPreset(presetName) {
+            const preset = presets[presetName];
+            if (!preset) return;
+
+            document.getElementById('profileName').value = preset.name;
+            document.getElementById('profileDescription').value = preset.description;
+            document.getElementById('profileVersion').value = preset.version;
+            document.getElementById('mcVersion').value = preset.mcVersion;
+            document.getElementById('loader').value = preset.loader;
+            document.getElementById('author').value = preset.author;
+
+            // Wyczyść istniejące mody
+            const modsList = document.getElementById('modsList');
+            modsList.innerHTML = '';
+
+            // Dodaj mody z presetu
+            preset.modIds.forEach(modId => {
+                addMod(modId);
+            });
+
+            // Jeśli brak modów, dodaj jeden pusty
+            if (preset.modIds.length === 0) {
+                addMod();
+            }
+
+            generateTemplate();
+        }
+
+        function addMod(modId = '') {
+            const modsList = document.getElementById('modsList');
+            const modGroup = document.createElement('div');
+            modGroup.className = 'mod-input-group';
+            modGroup.innerHTML = `
+                <input type="text" placeholder="ID moda (np. AANobbMI)" class="mod-id-input" value="${modId}">
+                <button class="btn btn-danger btn-small" onclick="removeMod(this)">Usuń</button>
+            `;
+            modsList.appendChild(modGroup);
+
+            // Dodaj event listener do automatycznego odświeżania
+            const input = modGroup.querySelector('.mod-id-input');
+            input.addEventListener('input', generateTemplate);
+        }
+
+        function removeMod(button) {
+            const modGroup = button.parentElement;
+            modGroup.remove();
+            generateTemplate();
+        }
+
+        function generateTemplate() {
+            const template = {
+                name: document.getElementById('profileName').value || "",
+                description: document.getElementById('profileDescription').value || "",
+                version: document.getElementById('profileVersion').value || "1.0.0",
+                mcVersion: document.getElementById('mcVersion').value || "",
+                loader: document.getElementById('loader').value || "fabric",
+                author: document.getElementById('author').value || "",
+                modIds: []
+            };
+
+            // Zbierz ID modów
+            const modInputs = document.querySelectorAll('.mod-id-input');
+            modInputs.forEach(input => {
+                const value = input.value.trim();
+                if (value) {
+                    template.modIds.push(value);
+                }
+            });
+
+            // Wyświetl JSON
+            const jsonOutput = document.getElementById('jsonOutput');
+            jsonOutput.textContent = JSON.stringify(template, null, 2);
+        }
+
+        function copyToClipboard() {
+            const jsonOutput = document.getElementById('jsonOutput');
+            navigator.clipboard.writeText(jsonOutput.textContent).then(() => {
+                // Pokaż komunikat o skopiowaniu
+                const originalText = jsonOutput.textContent;
+                jsonOutput.textContent = '✅ Skopiowano do schowka!';
+                setTimeout(() => {
+                    jsonOutput.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Błąd kopiowania: ', err);
+                alert('Nie udało się skopiować. Spróbuj ponownie.');
+            });
+        }
+
+        function downloadTemplate() {
+            const jsonOutput = document.getElementById('jsonOutput');
+            const profileName = document.getElementById('profileName').value || 'template';
+            const filename = `${profileName.toLowerCase().replace(/\s+/g, '-')}.json`;
+            
+            const blob = new Blob([jsonOutput.textContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Automatyczne odświeżanie przy zmianie pól
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = ['profileName', 'profileDescription', 'profileVersion', 'mcVersion', 'loader', 'author'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', generateTemplate);
+            });
+
+            // Dodaj pierwszy pusty mod
+            addMod();
+            
+            // Załaduj pusty szablon
+            loadPreset('empty');
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ const { pipeline } = require('stream/promises');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const CURSEFORGE_API_KEY = 'YOUR CURSEFORGE API KEY HERE';
+const CURSEFORGE_API_KEY = 'YOUR API KEY HERE';
 const CURSEFORGE_API_URL = 'https://api.curseforge.com';
 const MINECRAFT_GAME_ID = 432;
 const MODS_CLASS_ID = 6;
@@ -20,14 +20,16 @@ import('node-fetch').then(nodeFetch => {
 
 function createWindow () {
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 750,
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    resizable: false,
+    maximizable: false,
+    minimizable: true
   });
 
   mainWindow.loadFile('index.html');
@@ -173,8 +175,11 @@ ipcMain.handle('get-shader-path', async () => {
 });
 
 ipcMain.handle('browse-for-directory', async () => {
-  const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ['openDirectory'] });
-  return canceled ? null : filePaths[0];
+  // Usunięto dialog - zwracamy domyślną ścieżkę
+  const basePath = os.platform() === 'win32' && process.env.APPDATA
+      ? process.env.APPDATA
+      : os.homedir();
+  return path.join(basePath, '.ogulniega', 'profile', 'mods');
 });
 
 ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) => {
@@ -188,15 +193,8 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 
     try {
         await fs.access(fullPath);
-        const { response } = await dialog.showMessageBox(mainWindow, {
-            type: 'question',
-            title: 'Plik już istnieje',
-            message: `Plik "${filename}" już istnieje. Czy chcesz go nadpisać?`,
-            buttons: ['Tak', 'Nie'],
-            defaultId: 1,
-            cancelId: 1
-        });
-        if (response === 1) return { success: false, error: 'Pobieranie anulowane.' };
+        // Automatycznie nadpisujemy plik bez pytania
+        console.log(`[MainJS] Plik ${filename} już istnieje - nadpisywanie...`);
     } catch (e) {  }
 
     const response = await fetch(url, { headers: { 'User-Agent': 'OgulniegaModManager/2.0' } });
@@ -223,23 +221,22 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 });
 
 ipcMain.on('show-error-message', (event, { title, content }) => {
-    dialog.showErrorBox(title || 'Błąd', content || 'Wystąpił nieznany błąd.');
+    // Usunięto dialog - logujemy błąd do konsoli
+    console.error(`[MainJS] ${title || 'Błąd'}: ${content || 'Wystąpił nieznany błąd.'}`);
 });
 
 ipcMain.on('show-info-message', (event, { title, content }) => {
-    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
-        type: 'info',
-        title: title || 'Informacja',
-        message: content || '',
-        buttons: ['OK']
-    });
+    // Usunięto dialog - logujemy informację do konsoli
+    console.log(`[MainJS] ${title || 'Informacja'}: ${content || ''}`);
 });
 
 async function checkWindowsHiddenAttribute(filePath) {
     if (os.platform() !== 'win32') return false;
     try {
         const { stdout } = await exec(`attrib "${filePath}"`, { windowsHide: true });
-        return stdout.trim().toUpperCase().startsWith('H');
+        // The 'H' (hidden) attribute can appear anywhere in the attribute list at the start of the string.
+        // We check the first 12 characters to be safe and avoid false positives from the file path.
+        return stdout.substring(0, 12).toUpperCase().includes('H');
     } catch (e) {
         console.error(`[MainJS] Błąd sprawdzania atrybutu 'ukryty': ${e.message}`);
         return false;
@@ -286,20 +283,154 @@ ipcMain.handle('toggle-mod-state', async (event, currentPath) => {
     const dirName = path.dirname(currentPath);
     const currentName = path.basename(currentPath);
     let newPath;
+    let isNowDisabled;
 
     if (os.platform() === 'win32') {
-        const isHidden = await checkWindowsHiddenAttribute(currentPath);
-        await exec(`attrib ${isHidden ? '-h' : '+h'} "${currentPath}"`, { windowsHide: true });
+        const isCurrentlyHidden = await checkWindowsHiddenAttribute(currentPath);
+        await exec(`attrib ${isCurrentlyHidden ? '-h' : '+h'} "${currentPath}"`, { windowsHide: true });
         newPath = currentPath;
+        isNowDisabled = !isCurrentlyHidden;
     } else {
-        newPath = currentName.startsWith('.')
+        const isCurrentlyHidden = currentName.startsWith('.');
+        newPath = isCurrentlyHidden
             ? path.join(dirName, currentName.substring(1))
             : path.join(dirName, `.${currentName}`);
         await fs.rename(currentPath, newPath);
+        isNowDisabled = !isCurrentlyHidden;
     }
-    return { success: true, newPath };
+    return { success: true, newPath, isDisabled: isNowDisabled };
   } catch (error) {
     console.error(`[MainJS] Błąd podczas zmiany stanu moda:`, error);
     return { success: false, error: error.message };
   }
+});
+
+// GitHub Profiles functionality
+ipcMain.handle('fetch-github-repo-contents', async (event, { owner, repo, path = '' }) => {
+  if (!fetch) return { success: false, error: 'Moduł fetch nie jest załadowany.' };
+
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  console.log(`[MainJS] Pobieranie zawartości repo z GitHub: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      headers: { 
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'OgulniegaModManager/2.0'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`GitHub API Error (${response.status}): ${response.statusText}`);
+    }
+    
+    const contents = await response.json();
+    return { success: true, data: contents };
+  } catch (error) {
+    console.error('Błąd pobierania zawartości repo z GitHub:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('fetch-github-file', async (event, { owner, repo, path }) => {
+  if (!fetch) return { success: false, error: 'Moduł fetch nie jest załadowany.' };
+
+  const url = `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`;
+  console.log(`[MainJS] Pobieranie pliku z GitHub: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Nie udało się pobrać pliku: ${response.statusText}`);
+    }
+    
+    const content = await response.text();
+    return { success: true, data: content };
+  } catch (error) {
+    console.error('Błąd pobierania pliku z GitHub:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('fetch-modrinth-project', async (event, { projectId }) => {
+  if (!fetch) return { success: false, error: 'Moduł fetch nie jest załadowany.' };
+
+  const url = `https://api.modrinth.com/v2/project/${projectId}`;
+  console.log(`[MainJS] Pobieranie projektu z Modrinth: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Modrinth API Error (${response.status}): ${response.statusText}`);
+    }
+    
+    const project = await response.json();
+    return { success: true, data: project };
+  } catch (error) {
+    console.error('Błąd pobierania projektu z Modrinth:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('fetch-modrinth-project-versions', async (event, { projectId, gameVersion, loader }) => {
+  if (!fetch) return { success: false, error: 'Moduł fetch nie jest załadowany.' };
+
+  const loaders = JSON.stringify([loader || 'fabric']);
+  const game_versions = JSON.stringify([gameVersion]);
+  const url = `https://api.modrinth.com/v2/project/${projectId}/version?loaders=${loaders}&game_versions=${game_versions}`;
+  
+  console.log(`[MainJS] Pobieranie wersji projektu z Modrinth: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'OgulniegaModManager/2.0' }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Modrinth API Error (${response.status}): ${response.statusText}`);
+    }
+    
+    const versions = await response.json();
+    return { success: true, data: versions };
+  } catch (error) {
+    console.error('Błąd pobierania wersji projektu z Modrinth:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('check-file-exists', async (event, { directoryPath, filename }) => {
+  try {
+    const fullPath = path.join(directoryPath, filename);
+    await fs.access(fullPath);
+    return { success: true, exists: true, path: fullPath };
+  } catch (error) {
+    return { success: true, exists: false };
+  }
+});
+
+ipcMain.handle('get-directory-files', async (event, { directoryPath, extension = '.jar' }) => {
+  try {
+    await fs.access(directoryPath);
+    const items = await fs.readdir(directoryPath, { withFileTypes: true });
+    const files = items
+      .filter(item => item.isFile() && item.name.endsWith(extension))
+      .map(item => ({
+        name: item.name,
+        path: path.join(directoryPath, item.name)
+      }));
+    return { success: true, files };
+  } catch (error) {
+    console.error(`[MainJS] Błąd odczytu katalogu ${directoryPath}:`, error);
+    return { success: false, error: error.message, files: [] };
+  }
+});
+
+ipcMain.on('close-app', () => {
+  app.quit();
 });

@@ -13,6 +13,7 @@
     <div id="animated-background"></div>
 
     <div id="landingPage" class="landing-container">
+        <button id="closeAppBtn" class="btn-close-app" title="Zamknij aplikację">×</button>
         <div class="landing-content">
             <img src="icons/icon.ico" alt="App Logo" class="landing-logo">
             <h1 class="landing-title">Ogulniega Mod Manager</h1>
@@ -25,6 +26,10 @@
                 <button id="selectCurseForge" class="btn-platform">
                     <img src="icons/curseforge.svg" alt="CurseForge" class="platform-choice-icon">
                     <span>CurseForge</span>
+                </button>
+                <button id="modsProfileButton" class="btn-platform">
+                    <img src="icons/profile.svg" alt="Mods Profile" class="platform-choice-icon">
+                    <span>Mods Profile</span>
                 </button>
                 <button id="defaultModsButton" class="btn-platform">
                     <img src="icons/Folder.svg" alt="Domyślne Mody" class="platform-choice-icon">
@@ -62,7 +67,7 @@
 
         <main class="main-content">
             <section id="searchArea" class="search-area interactive-card">
-                <input type="text" id="modQuery" placeholder="Wybierz wersję MC, aby wyszukać mody..." disabled>
+                <input type="text" id="modQuery" class="input-field" placeholder="Wybierz wersję MC, aby wyszukać mody..." disabled>
                 <button id="searchButton" class="btn btn-primary" disabled>
                     Szukaj
                 </button>
@@ -154,6 +159,90 @@
             <div class="modal-footer">
                 <button id="cancelProfileChoiceButton" class="btn btn-secondary">Anuluj</button>
                 <button id="confirmProfileChoiceButton" class="btn btn-primary">Zatwierdź</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mods Profile Modal -->
+    <div id="modsProfileModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Mods Profile - GitHub Releases</h3>
+                <button class="btn-close" id="closeModsProfileModalButton" aria-label="Zamknij">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="githubRepoInput">GitHub Repository (owner/repo):</label>
+                    <input type="text" id="githubRepoInput" class="input-field" placeholder="np. Tomel999/mod-profiles">
+                </div>
+                <div class="form-group">
+                    <label for="minecraftVersionProfile">Minecraft Version:</label>
+                    <select id="minecraftVersionProfile" class="input-field">
+                        <option value="">-- Wybierz wersję MC --</option>
+                    </select>
+                </div>
+                <div class="form-group" id="profileSelectionGroup" style="display: none;">
+                    <label for="profileFolderSelect">Wybierz profil dla tej wersji:</label>
+                    <select id="profileFolderSelect" class="input-field">
+                        <option value="">-- Wybierz profil --</option>
+                    </select>
+                </div>
+                <button id="loadProfilesButton" class="btn btn-primary">Załaduj Profile</button>
+                
+                <div id="profilesListContainer" style="display: none; margin-top: 20px;">
+                    <h4>Dostępne Profile:</h4>
+                    <div id="profilesList" class="profiles-list"></div>
+                </div>
+
+                <div id="profileModsListContainer" style="display: none; margin-top: 20px;">
+                    <h4>Lista Modów w Profilu:</h4>
+                    <div id="profileModsPreview" class="profile-mods-preview">
+                        <div class="mods-loading" style="text-align: center; padding: 20px;">
+                            <div class="loader"></div>
+                            <p>Pobieranie informacji o modach...</p>
+                        </div>
+                    </div>
+                    <div class="mod-selection-controls" style="margin-top: 15px; display: none;">
+                        <div class="selection-info">
+                            <span id="selectedModsCount">0</span> z <span id="totalModsCount">0</span> modów zaznaczonych
+                        </div>
+                        <div class="selection-buttons">
+                            <button id="selectAllModsButton" class="btn btn-secondary">Zaznacz Wszystkie</button>
+                            <button id="deselectAllModsButton" class="btn btn-secondary">Odznacz Wszystkie</button>
+                        </div>
+                    </div>
+                    <div class="profile-actions" style="margin-top: 15px;">
+                        <button id="downloadSelectedModsButton" class="btn btn-primary" style="display: none;">Pobierz Zaznaczone Mody</button>
+                        <button id="backToProfilesButton" class="btn btn-secondary">Powrót do Listy Profili</button>
+                    </div>
+                </div>
+
+                <div id="profileDetailsContainer" style="display: none; margin-top: 20px;">
+                    <h4>Szczegóły Profilu:</h4>
+                    <div id="profileDetails" class="profile-details">
+                        <p><strong>Nazwa:</strong> <span id="profileName"></span></p>
+                        <p><strong>Wersja MC:</strong> <span id="profileMcVersion"></span></p>
+                        <p><strong>Liczba modów:</strong> <span id="profileModCount"></span></p>
+                        <div id="profileModsList" class="profile-mods-list"></div>
+                    </div>
+                    <div id="downloadLocationInfo" style="margin-bottom: 15px; padding: 10px; background: var(--theme-bg-dark); border-radius: var(--border-radius-sm); display: none;">
+                        <p><strong>Folder docelowy:</strong> <span id="targetFolderDisplay">Nie wybrano</span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="downloadProfileButton" class="btn btn-primary">Pobierz Wszystkie Mody</button>
+                    </div>
+                </div>
+
+                <div id="profileDownloadProgress" style="display: none; margin-top: 20px;">
+                    <h4>Pobieranie Profilu:</h4>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" id="profileProgressBar"></div>
+                        </div>
+                        <span id="profileProgressText" class="progress-text">0%</span>
+                    </div>
+                    <p id="currentDownloadingMod" class="status-text-field">Przygotowywanie...</p>
+                </div>
             </div>
         </div>
     </div>
