@@ -16,7 +16,7 @@ Aby uruchomić projekt lokalnie, postępuj zgodnie z poniższymi krokami:
 
 1.  **Sklonuj repozytorium:**
     ```bash
-    git clone <adres-repozytorium>
+    git clone https://github.com/Tomel999/Ogulniega-Mod-Manager.git
     cd "Ogulniega Mod Manager v2"
     ```
 
