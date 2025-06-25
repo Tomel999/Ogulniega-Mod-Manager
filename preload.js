@@ -22,10 +22,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.removeAllListeners('download-complete');
         ipcRenderer.removeAllListeners('download-error');
     },
+
     fetchGithubRepoContents: (args) => ipcRenderer.invoke('fetch-github-repo-contents', args),
     fetchGithubFile: (args) => ipcRenderer.invoke('fetch-github-file', args),
     fetchModrinthProject: (args) => ipcRenderer.invoke('fetch-modrinth-project', args),
     fetchModrinthProjectVersions: (args) => ipcRenderer.invoke('fetch-modrinth-project-versions', args),
+
     checkFileExists: (args) => ipcRenderer.invoke('check-file-exists', args),
     getDirectoryFiles: (args) => ipcRenderer.invoke('get-directory-files', args),
     closeApp: () => ipcRenderer.send('close-app')
