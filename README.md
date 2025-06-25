@@ -8,7 +8,6 @@ Prosty i intuicyjny menedżer modów do gry Minecraft, stworzony przy użyciu El
 - **Domyślne Mody:** Zarządzaj lokalnymi modami przechowywanymi w folderach profili Ogulniega.
 - **Włączanie/Wyłączanie Modów:** Aktywuj lub deaktywuj mody jednym kliknięciem, bez potrzeby ich usuwania. Zmiana stanu polega na ukrywaniu plików (w systemie Windows) lub zmianie nazwy (na innych systemach).
 - **Profile Modów z GitHub:** Wczytuj i pobieraj predefiniowane listy modów z publicznych repozytoriów na GitHub.
-- **Filtrowanie Wersji:** Wybierz wersję Minecrafta, a aplikacja automatycznie przefiltruje kompatybilne mody.
 - **Prosty Interfejs:** Czysty i łatwy w obsłudze interfejs użytkownika.
 
 ## Instalacja
