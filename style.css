@@ -1,4 +1,4 @@
-/* BACKUP OF ORIGINAL STYLE.CSS - Created for UI improvements */
+
 @font-face {
     font-family: 'Compliance Sans';
     src: url('./fonts/Faithful.woff2') format('woff2'),
@@ -494,11 +494,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, 
-        rgba(75, 52, 20, 0.9) 0%, 
-        rgba(110, 76, 30, 0.8) 25%, 
-        rgba(128, 94, 47, 0.7) 50%, 
-        rgba(221, 182, 93, 0.6) 75%, 
+    background: linear-gradient(135deg,
+        rgba(75, 52, 20, 0.9) 0%,
+        rgba(110, 76, 30, 0.8) 25%,
+        rgba(128, 94, 47, 0.7) 50%,
+        rgba(221, 182, 93, 0.6) 75%,
         rgba(255, 214, 83, 0.5) 100%);
     backdrop-filter: blur(5px);
     display: flex;
@@ -659,7 +659,6 @@ body {
     display: none !important;
 }
 
-/* Mods Profile Styles */
 .profiles-list {
     max-height: 300px;
     overflow-y: auto;
@@ -787,7 +786,6 @@ body {
     font-size: 1rem;
 }
 
-/* Enhanced mod item styles for profile display */
 .mod-item.enhanced {
     background: var(--theme-surface);
     border: 1px solid var(--theme-border-light);
@@ -907,7 +905,6 @@ body {
     50% { opacity: 0.7; }
 }
 
-/* Legacy mod item styles for backward compatibility */
 .mod-item:not(.enhanced) {
     display: flex;
     justify-content: space-between;
@@ -930,7 +927,6 @@ body {
     margin-left: 8px;
 }
 
-/* Profile header styles */
 .profile-header {
     background: var(--theme-surface);
     border: 1px solid var(--theme-border-light);
@@ -974,7 +970,6 @@ body {
     border-color: var(--theme-accent-yellow-hover) !important;
 }
 
-/* Mod preview styles */
 .mods-preview-container {
     max-height: 400px;
     overflow-y: auto;
@@ -1005,7 +1000,6 @@ body {
     border-color: var(--theme-danger);
 }
 
-/* Mod selection checkbox */
 .mod-selection-checkbox {
     flex-shrink: 0;
     display: flex;
@@ -1082,7 +1076,6 @@ body {
     margin-left: auto;
 }
 
-/* Mod selection controls */
 .mod-selection-controls {
     background: var(--theme-surface);
     border: 1px solid var(--theme-border-light);
@@ -1117,7 +1110,6 @@ body {
     min-width: auto;
 }
 
-/* Profile actions */
 .profile-actions {
     display: flex;
     gap: 10px;
@@ -1129,7 +1121,6 @@ body {
     min-width: 120px;
 }
 
-/* Loading and error states */
 .mods-loading, .no-mods-message, .error-message {
     padding: 40px 20px;
     text-align: center;
@@ -1155,54 +1146,54 @@ body {
     .landing-title {
         font-size: 2rem;
     }
-    
+
     .platform-choice {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .btn-platform {
         width: 100%;
         max-width: 200px;
     }
-    
+
     .app-header {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .header-controls {
         justify-content: center;
     }
-    
+
     .search-area {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .input-field {
         min-width: auto;
     }
-    
+
     .results-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .version-item {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
     }
-    
+
     .version-actions {
         margin-left: 0;
     }
-    
+
     .path-input-group {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .modal-content {
         width: 95%;
         margin: 10px;
