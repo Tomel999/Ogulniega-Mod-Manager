@@ -584,10 +584,10 @@ document.addEventListener("DOMContentLoaded", () => {
             button.textContent = 'Zmieniam...';
 
             const result = await window.electronAPI.toggleModState(path);
-            
+
             if (result.success) {
                 const isEnabled = !result.isDisabled;
-                
+
                 button.dataset.path = result.newPath;
 
                 button.textContent = isEnabled ? "Włączony" : "Wyłączony";
@@ -601,10 +601,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 showStatus(`Zmieniono stan moda: ${modCard.querySelector('h3').textContent}`, 'success');
             } else {
                 showStatus(`Błąd: ${result.error}`, 'error');
+
                 const wasEnabled = button.classList.contains('btn-primary');
                 button.textContent = wasEnabled ? "Włączony" : "Wyłączony";
             }
-            
+
             button.disabled = false;
         });
     });
@@ -780,7 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentDownloadingMod = document.getElementById('currentDownloadingMod');
   const downloadLocationInfo = document.getElementById('downloadLocationInfo');
   const targetFolderDisplay = document.getElementById('targetFolderDisplay');
-  
+
   const profileModsListContainer = document.getElementById('profileModsListContainer');
   const profileModsPreview = document.getElementById('profileModsPreview');
   const downloadSelectedModsButton = document.getElementById('downloadSelectedModsButton');
@@ -795,6 +796,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentProfile = null;
 
   async function openModsProfileModal() {
+
     if (availableMcVersions.length === 0) {
       try {
         const profileData = await window.electronAPI.getProfileFolders();
@@ -804,9 +806,9 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error('Błąd wczytywania wersji MC:', error);
       }
     }
-    
+
     minecraftVersionProfile.innerHTML = '<option value="">-- Wybierz wersję MC --</option>';
-    
+
     if (availableMcVersions.length > 0) {
       availableMcVersions.forEach(version => {
         const option = new Option(version, version);
@@ -817,35 +819,38 @@ document.addEventListener("DOMContentLoaded", () => {
       option.disabled = true;
       minecraftVersionProfile.appendChild(option);
     }
-    
+
     if (!githubRepoInput.value) {
       githubRepoInput.value = 'Tomel999/mod-profiles';
     }
-    
+
     modsProfileModal.classList.add('active');
   }
 
   function handleMcVersionChange() {
     const selectedVersion = minecraftVersionProfile.value;
-    
+
     if (!selectedVersion) {
       profileSelectionGroup.style.display = 'none';
       return;
     }
-    
+
     const profilesForVersion = groupedProfileFolders[selectedVersion] || [];
-    
+
     if (profilesForVersion.length > 1) {
+
       profileSelectionGroup.style.display = 'block';
       profileFolderSelect.innerHTML = '<option value="">-- Wybierz profil --</option>';
-      
+
       profilesForVersion.forEach(profile => {
         const option = new Option(profile.name, profile.path);
         profileFolderSelect.appendChild(option);
       });
     } else if (profilesForVersion.length === 1) {
+
       profileSelectionGroup.style.display = 'none';
     } else {
+
       profileSelectionGroup.style.display = 'none';
     }
   }
@@ -853,17 +858,17 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadGithubProfiles() {
     const repoInput = githubRepoInput.value.trim();
     const mcVersion = minecraftVersionProfile.value;
-    
+
     if (!repoInput) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Podaj repository GitHub!" });
       return;
     }
-    
+
     if (!mcVersion) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Wybierz wersję Minecraft!" });
       return;
     }
-    
+
     const profilesForVersion = groupedProfileFolders[mcVersion] || [];
     if (profilesForVersion.length > 1 && !profileFolderSelect.value) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Wybierz profil dla tej wersji MC!" });
@@ -878,17 +883,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadProfilesButton.disabled = true;
     loadProfilesButton.textContent = 'Ładowanie...';
-    
+
     try {
+
       const result = await window.electronAPI.fetchGithubRepoContents({ owner, repo, path: mcVersion });
-      
+
       if (!result.success) {
         throw new Error(result.error);
       }
 
       const contents = result.data;
-      
-      const jsonFiles = contents.filter(item => 
+
+      const jsonFiles = contents.filter(item =>
         item.type === 'file' && item.name.endsWith('.json')
       );
 
@@ -898,7 +904,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       displayProfiles(jsonFiles, mcVersion, owner, repo);
       profilesListContainer.style.display = 'block';
-      
+
     } catch (error) {
       console.error('Błąd ładowania profili:', error);
       window.electronAPI.showErrorMessage({ title: "Błąd ładowania profili", content: error.message });
@@ -910,13 +916,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function displayProfiles(jsonFiles, mcVersion, owner, repo) {
     profilesList.innerHTML = '';
-    
+
     jsonFiles.forEach(file => {
       const profileCard = document.createElement('div');
       profileCard.className = 'profile-card';
-      
+
       const profileName = file.name.replace('.json', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      
+
       profileCard.innerHTML = `
         <div class="profile-card-header">
           <h4>${profileName}</h4>
@@ -928,7 +934,7 @@ document.addEventListener("DOMContentLoaded", () => {
           Załaduj Profil
         </button>
       `;
-      
+
       profilesList.appendChild(profileCard);
     });
 
@@ -942,17 +948,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function showProfileModsList(fileData) {
     try {
+
       profilesListContainer.style.display = 'none';
       profileModsListContainer.style.display = 'block';
-      
+
       profileModsPreview.innerHTML = `
         <div class="mods-loading" style="text-align: center; padding: 20px;">
           <div class="loader"></div>
           <p>Pobieranie informacji o modach z profilu "${fileData.name.replace('.json', '')}"...</p>
         </div>
       `;
-      
-      const result = await window.electronAPI.fetchGithubFile({ 
+
+      const result = await window.electronAPI.fetchGithubFile({
         owner: fileData.owner,
         repo: fileData.repo,
         path: `${fileData.mcVersion}/${fileData.name}`
@@ -964,7 +971,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const profileData = JSON.parse(result.data);
       const modIds = profileData.modIds || [];
-      
+
       if (modIds.length === 0) {
         profileModsPreview.innerHTML = `
           <div class="no-mods-message" style="text-align: center; padding: 20px; color: var(--theme-text-dim);">
@@ -990,17 +997,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const modsContainer = document.createElement('div');
       modsContainer.className = 'mods-preview-container';
-      
+
       profileModsPreview.innerHTML = '';
       profileModsPreview.appendChild(profileHeader);
       profileModsPreview.appendChild(modsContainer);
-      
+
       for (let index = 0; index < modIds.length; index++) {
         const modId = modIds[index];
-        
+
         try {
+
           const projectResult = await window.electronAPI.fetchModrinthProject({ projectId: modId });
-          
+
           let modInfo = {
             id: modId,
             name: modId,
@@ -1009,7 +1017,7 @@ document.addEventListener("DOMContentLoaded", () => {
             downloads: 0,
             categories: []
           };
-          
+
           if (projectResult.success && projectResult.data) {
             modInfo.name = projectResult.data.title || modId;
             modInfo.description = projectResult.data.description || 'Brak opisu';
@@ -1017,7 +1025,7 @@ document.addEventListener("DOMContentLoaded", () => {
             modInfo.downloads = projectResult.data.downloads || 0;
             modInfo.categories = projectResult.data.categories || [];
           }
-          
+
           const modPreviewItem = document.createElement('div');
           modPreviewItem.className = 'mod-preview-item';
           modPreviewItem.innerHTML = `
@@ -1040,9 +1048,9 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="mod-id-badge">${modId}</span>
             </div>
           `;
-          
+
           modsContainer.appendChild(modPreviewItem);
-          
+
         } catch (error) {
           console.error(`Błąd pobierania informacji o modzie ${modId}:`, error);
 
@@ -1067,11 +1075,11 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="mod-id-badge">${modId}</span>
             </div>
           `;
-          
+
           modsContainer.appendChild(modPreviewItem);
         }
       }
-      
+
       currentProfile = {
         ...profileData,
         name: profileData.name || fileData.name.replace('.json', ''),
@@ -1079,13 +1087,13 @@ document.addEventListener("DOMContentLoaded", () => {
         fileName: fileData.name,
         fileData: fileData
       };
-      
+
       modSelectionControls.style.display = 'block';
       downloadSelectedModsButton.style.display = 'inline-block';
       updateSelectedModsCount();
-      
+
       setupModCheckboxListeners();
-      
+
     } catch (error) {
       console.error('Błąd wyświetlania listy modów:', error);
       profileModsPreview.innerHTML = `
@@ -1099,10 +1107,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateSelectedModsCount() {
     const checkboxes = document.querySelectorAll('.mod-checkbox');
     const selectedCheckboxes = document.querySelectorAll('.mod-checkbox:checked');
-    
+
     selectedModsCount.textContent = selectedCheckboxes.length;
     totalModsCount.textContent = checkboxes.length;
-    
+
     if (selectedCheckboxes.length > 0) {
       downloadSelectedModsButton.disabled = false;
       downloadSelectedModsButton.textContent = `Pobierz Zaznaczone Mody (${selectedCheckboxes.length})`;
@@ -1114,7 +1122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setupModCheckboxListeners() {
     const checkboxes = document.querySelectorAll('.mod-checkbox');
-    
+
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', updateSelectedModsCount);
     });
@@ -1146,7 +1154,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadProfileDetails(fileData) {
     try {
-      const result = await window.electronAPI.fetchGithubFile({ 
+
+      const result = await window.electronAPI.fetchGithubFile({
         owner: fileData.owner,
         repo: fileData.repo,
         path: `${fileData.mcVersion}/${fileData.name}`
@@ -1157,9 +1166,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const profileData = JSON.parse(result.data);
-      
+
       const profileName = fileData.name.replace('.json', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      
+
       currentProfile = {
         ...profileData,
         name: profileName,
@@ -1179,14 +1188,13 @@ document.addEventListener("DOMContentLoaded", () => {
   async function displayProfileDetails(profile) {
     document.getElementById('profileName').textContent = profile.name;
     document.getElementById('profileMcVersion').textContent = profile.mcVersion;
-    
-    // Use only modIds - ignore mod names
+
     const modIds = profile.modIds || [];
     document.getElementById('profileModCount').textContent = modIds.length;
 
     const modsList = document.getElementById('profileModsList');
     modsList.innerHTML = '<h5>Lista modów:</h5>';
-    
+
     if (modIds.length === 0) {
       modsList.innerHTML += '<p>Brak ID modów w profilu. Upewnij się, że profil zawiera pole "modIds" z listą ID modów z Modrinth.</p>';
       return;
@@ -1194,40 +1202,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const modsContainer = document.createElement('div');
     modsContainer.className = 'mods-container';
-    
-    // Show loading message
+
     modsList.appendChild(modsContainer);
     modsContainer.innerHTML = '<div class="loader" style="margin: 20px auto;"></div><p style="text-align: center;">Pobieranie informacji o modach...</p>';
-    
-    // Store mod information for later use during download
+
     profile.modDetails = [];
-    
-    // Fetch mod names from Modrinth API with better error handling
+
     for (let index = 0; index < modIds.length; index++) {
       const modId = modIds[index];
-      
+
       try {
-        // Get mod info from Modrinth using ID
+
         const projectResult = await window.electronAPI.fetchModrinthProject({ projectId: modId });
-        
+
         let modInfo = {
           id: modId,
-          name: modId, // fallback to ID
+          name: modId,
           description: 'Brak opisu',
           iconUrl: null,
           downloads: 0
         };
-        
+
         if (projectResult.success && projectResult.data) {
           modInfo.name = projectResult.data.title || modId;
           modInfo.description = projectResult.data.description || 'Brak opisu';
           modInfo.iconUrl = projectResult.data.icon_url;
           modInfo.downloads = projectResult.data.downloads || 0;
         }
-        
+
         profile.modDetails.push(modInfo);
-        
-        // Create enhanced mod item with more information
+
         const modItem = document.createElement('div');
         modItem.className = 'mod-item enhanced';
         modItem.innerHTML = `
@@ -1244,17 +1248,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="mod-status" id="mod-status-${index}">Gotowy do pobrania</span>
           </div>
         `;
-        
-        // Replace loading content with actual mod items
+
         if (index === 0) {
-          modsContainer.innerHTML = ''; // Clear loading message
+          modsContainer.innerHTML = '';
         }
         modsContainer.appendChild(modItem);
-        
+
       } catch (error) {
         console.error(`Błąd pobierania informacji o modzie ${modId}:`, error);
-        
-        // Store basic info even on error
+
         profile.modDetails.push({
           id: modId,
           name: modId,
@@ -1262,8 +1264,7 @@ document.addEventListener("DOMContentLoaded", () => {
           iconUrl: null,
           downloads: 0
         });
-        
-        // Create mod item with error state
+
         const modItem = document.createElement('div');
         modItem.className = 'mod-item error';
         modItem.innerHTML = `
@@ -1280,24 +1281,22 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="mod-status" id="mod-status-${index}">Błąd informacji</span>
           </div>
         `;
-        
-        // Replace loading content with actual mod items
+
         if (index === 0) {
-          modsContainer.innerHTML = ''; // Clear loading message
+          modsContainer.innerHTML = '';
         }
         modsContainer.appendChild(modItem);
       }
     }
-    
+
     modsList.appendChild(modsContainer);
-    
-    // Update download location info
+
     updateDownloadLocationInfo();
   }
 
   function updateDownloadLocationInfo() {
     const targetFolder = getSelectedProfileFolder();
-    
+
     if (targetFolder) {
       const folderName = targetFolder.split(/[/\\]/).pop();
       targetFolderDisplay.textContent = folderName;
@@ -1307,19 +1306,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-
   function getSelectedProfileFolder() {
     const mcVersion = minecraftVersionProfile.value;
     const profilesForVersion = groupedProfileFolders[mcVersion] || [];
-    
+
     if (profilesForVersion.length === 1) {
-      // Single profile - use it automatically
+
       return profilesForVersion[0].path;
     } else if (profilesForVersion.length > 1) {
-      // Multiple profiles - use selected one
+
       return profileFolderSelect.value;
     }
-    
+
     return null;
   }
 
@@ -1329,29 +1327,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Get the target folder from selected profile
     const targetFolder = getSelectedProfileFolder();
-    
+
     if (!targetFolder) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Nie można znaleźć profilu Ogulniegi dla tej wersji MC!" });
       return;
     }
 
-    // Use modDetails if available, otherwise fall back to modIds
     const modDetails = currentProfile.modDetails || [];
     const modIds = currentProfile.modIds || [];
-    
+
     if (modIds.length === 0) {
-      window.electronAPI.showErrorMessage({ 
-        title: "Błąd", 
-        content: "Profil nie zawiera ID modów! Upewnij się, że profil ma pole 'modIds' z listą ID modów z Modrinth." 
+      window.electronAPI.showErrorMessage({
+        title: "Błąd",
+        content: "Profil nie zawiera ID modów! Upewnij się, że profil ma pole 'modIds' z listą ID modów z Modrinth."
       });
       return;
     }
 
     profileDownloadProgress.style.display = 'block';
     downloadProfileButton.disabled = true;
-    
+
     let downloadedCount = 0;
     let skippedCount = 0;
     const totalMods = modIds.length;
@@ -1360,9 +1356,9 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < modIds.length; i++) {
       const modId = modIds[i];
       const modInfo = modDetails[i] || { id: modId, name: modId };
-      
+
       try {
-        // Update current download display with mod name
+
         currentDownloadingMod.textContent = `Pobieranie: ${modInfo.name}`;
         const statusElement = document.getElementById(`mod-status-${i}`);
         if (statusElement) {
@@ -1370,7 +1366,6 @@ document.addEventListener("DOMContentLoaded", () => {
           statusElement.className = 'mod-status downloading';
         }
 
-        // Get compatible version
         const versionsResult = await window.electronAPI.fetchModrinthProjectVersions({
           projectId: modId,
           gameVersion: currentProfile.mcVersion,
@@ -1388,12 +1383,10 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(`Brak pliku do pobrania`);
         }
 
-        // Update status to downloading
         if (statusElement) {
           statusElement.textContent = `Pobieranie ${file.filename}...`;
         }
 
-        // Download the mod
         const downloadResult = await window.electronAPI.downloadFile({
           url: file.url,
           directoryPath: targetFolder,
@@ -1409,7 +1402,6 @@ document.addEventListener("DOMContentLoaded", () => {
         profileProgressBar.style.width = `${progress}%`;
         profileProgressText.textContent = `${downloadedCount}/${totalMods} (${progress}%)`;
 
-        // Update status to success
         if (statusElement) {
           statusElement.textContent = `✅ Pobrano: ${file.filename}`;
           statusElement.className = 'mod-status success';
@@ -1424,8 +1416,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       } catch (error) {
         console.error(`Błąd pobierania moda ${modId} (${modInfo.name}):`, error);
-        
-        // Check if it's a "file already exists" error
+
         if (error.message.includes('już istnieje') || error.message.includes('anulowane')) {
           skippedCount++;
           const statusElement = document.getElementById(`mod-status-${i}`);
@@ -1433,7 +1424,7 @@ document.addEventListener("DOMContentLoaded", () => {
             statusElement.textContent = `⏭️ Pominięto (plik istnieje)`;
             statusElement.className = 'mod-status skipped';
           }
-          
+
           downloadResults.push({
             modId,
             modName: modInfo.name,
@@ -1446,7 +1437,7 @@ document.addEventListener("DOMContentLoaded", () => {
             statusElement.textContent = `❌ Błąd: ${error.message.substring(0, 50)}...`;
             statusElement.className = 'mod-status error';
           }
-          
+
           downloadResults.push({
             modId,
             modName: modInfo.name,
@@ -1457,32 +1448,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Final status update
     const successCount = downloadedCount;
     const errorCount = totalMods - downloadedCount - skippedCount;
-    
+
     currentDownloadingMod.textContent = `Ukończono! ✅ ${successCount} pobrano | ⏭️ ${skippedCount} pominięto | ❌ ${errorCount} błędów`;
     downloadProfileButton.disabled = false;
-    
-    // Show detailed completion message
+
     let message = `Pobieranie profilu "${currentProfile.name}" ukończone!\n\n`;
     message += `✅ Pomyślnie pobrano: ${successCount} modów\n`;
     if (skippedCount > 0) message += `⏭️ Pominięto (już istnieją): ${skippedCount} modów\n`;
     if (errorCount > 0) message += `❌ Błędy: ${errorCount} modów\n`;
     message += `\nLokalizacja: ${targetFolder}`;
-    
-    window.electronAPI.showInfoMessage({ 
-      title: "Pobieranie ukończone", 
+
+    window.electronAPI.showInfoMessage({
+      title: "Pobieranie ukończone",
       content: message
     });
-    
-    // Log detailed results for debugging
+
     console.log('Profile download results:', downloadResults);
   }
 
   async function downloadSelectedMods() {
     const selectedMods = getSelectedMods();
-    
+
     if (selectedMods.length === 0) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Nie zaznaczono żadnych modów do pobrania!" });
       return;
@@ -1493,24 +1481,21 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Get the target folder from selected profile
     const targetFolder = getSelectedProfileFolder();
-    
+
     if (!targetFolder) {
       window.electronAPI.showErrorMessage({ title: "Błąd", content: "Nie można znaleźć profilu Ogulniegi dla tej wersji MC!" });
       return;
     }
 
-    // Hide mod list and show download progress
     profileModsListContainer.style.display = 'none';
     profileDownloadProgress.style.display = 'block';
-    
+
     let downloadedCount = 0;
     let skippedCount = 0;
     const totalMods = selectedMods.length;
     const downloadResults = [];
 
-    // Get mod details from current profile
     const modDetails = currentProfile.modDetails || [];
 
     for (let i = 0; i < selectedMods.length; i++) {
@@ -1518,12 +1503,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const modId = selectedMod.modId;
       const originalIndex = selectedMod.index;
       const modInfo = modDetails[originalIndex] || { id: modId, name: modId };
-      
+
       try {
-        // Update current download display with mod name
+
         currentDownloadingMod.textContent = `Pobieranie: ${modInfo.name} (${i + 1}/${totalMods})`;
 
-        // Get compatible version
         const versionsResult = await window.electronAPI.fetchModrinthProjectVersions({
           projectId: modId,
           gameVersion: currentProfile.mcVersion,
@@ -1541,7 +1525,6 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(`Brak pliku do pobrania`);
         }
 
-        // Download the mod
         const downloadResult = await window.electronAPI.downloadFile({
           url: file.url,
           directoryPath: targetFolder,
@@ -1566,11 +1549,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       } catch (error) {
         console.error(`Błąd pobierania moda ${modId} (${modInfo.name}):`, error);
-        
-        // Check if it's a "file already exists" error
+
         if (error.message.includes('już istnieje') || error.message.includes('anulowane')) {
           skippedCount++;
-          
+
           downloadResults.push({
             modId,
             modName: modInfo.name,
@@ -1588,46 +1570,41 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Final status update
     const successCount = downloadedCount;
     const errorCount = totalMods - downloadedCount - skippedCount;
-    
+
     currentDownloadingMod.textContent = `Ukończono! ✅ ${successCount} pobrano | ⏭️ ${skippedCount} pominięto | ❌ ${errorCount} błędów`;
-    
-    // Show detailed completion message
+
     let message = `Pobieranie wybranych modów z profilu "${currentProfile.name}" ukończone!\n\n`;
     message += `📋 Wybrano: ${totalMods} modów\n`;
     message += `✅ Pomyślnie pobrano: ${successCount} modów\n`;
     if (skippedCount > 0) message += `⏭️ Pominięto (już istnieją): ${skippedCount} modów\n`;
     if (errorCount > 0) message += `❌ Błędy: ${errorCount} modów\n`;
     message += `\nLokalizacja: ${targetFolder}`;
-    
-    window.electronAPI.showInfoMessage({ 
-      title: "Pobieranie ukończone", 
+
+    window.electronAPI.showInfoMessage({
+      title: "Pobieranie ukończone",
       content: message
     });
-    
-    // Log detailed results for debugging
+
     console.log('Selected mods download results:', downloadResults);
-    
-    // Automatycznie wracamy do wyboru modów po 3 sekundach
+
     setTimeout(() => {
       profileDownloadProgress.style.display = 'none';
       profileModsListContainer.style.display = 'block';
     }, 3000);
   }
 
-  // Event listeners for mods profile
   closeModsProfileModalButton.addEventListener('click', () => {
     modsProfileModal.classList.remove('active');
-    // Reset modal state
+
     profilesListContainer.style.display = 'none';
     profileModsListContainer.style.display = 'none';
     profileDetailsContainer.style.display = 'none';
     profileDownloadProgress.style.display = 'none';
     modSelectionControls.style.display = 'none';
     currentProfile = null;
-    // Reset version inputs
+
     minecraftVersionProfile.value = '';
     profileSelectionGroup.style.display = 'none';
     profileFolderSelect.value = '';
@@ -1641,7 +1618,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProfilesButton.addEventListener('click', loadGithubProfiles);
   downloadProfileButton.addEventListener('click', downloadProfile);
 
-  // Handle new buttons for mod selection
   downloadSelectedModsButton.addEventListener('click', downloadSelectedMods);
 
   selectAllModsButton.addEventListener('click', selectAllMods);
@@ -1655,10 +1631,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentProfile = null;
   });
 
-  // Handle MC version selection
   minecraftVersionProfile.addEventListener('change', handleMcVersionChange);
-  
-  // Handle profile folder selection
+
   profileFolderSelect.addEventListener('change', () => {
     updateDownloadLocationInfo();
   });
