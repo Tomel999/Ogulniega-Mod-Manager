@@ -175,7 +175,6 @@ ipcMain.handle('get-shader-path', async () => {
 });
 
 ipcMain.handle('browse-for-directory', async () => {
-  // Usunięto dialog - zwracamy domyślną ścieżkę
   const basePath = os.platform() === 'win32' && process.env.APPDATA
       ? process.env.APPDATA
       : os.homedir();
@@ -193,7 +192,6 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 
     try {
         await fs.access(fullPath);
-        // Automatycznie nadpisujemy plik bez pytania
         console.log(`[MainJS] Plik ${filename} już istnieje - nadpisywanie...`);
     } catch (e) {  }
 
@@ -221,12 +219,10 @@ ipcMain.handle('download-file', async (event, { url, directoryPath, filename }) 
 });
 
 ipcMain.on('show-error-message', (event, { title, content }) => {
-    // Usunięto dialog - logujemy błąd do konsoli
     console.error(`[MainJS] ${title || 'Błąd'}: ${content || 'Wystąpił nieznany błąd.'}`);
 });
 
 ipcMain.on('show-info-message', (event, { title, content }) => {
-    // Usunięto dialog - logujemy informację do konsoli
     console.log(`[MainJS] ${title || 'Informacja'}: ${content || ''}`);
 });
 
@@ -234,8 +230,6 @@ async function checkWindowsHiddenAttribute(filePath) {
     if (os.platform() !== 'win32') return false;
     try {
         const { stdout } = await exec(`attrib "${filePath}"`, { windowsHide: true });
-        // The 'H' (hidden) attribute can appear anywhere in the attribute list at the start of the string.
-        // We check the first 12 characters to be safe and avoid false positives from the file path.
         return stdout.substring(0, 12).toUpperCase().includes('H');
     } catch (e) {
         console.error(`[MainJS] Błąd sprawdzania atrybutu 'ukryty': ${e.message}`);
@@ -305,7 +299,6 @@ ipcMain.handle('toggle-mod-state', async (event, currentPath) => {
   }
 });
 
-// GitHub Profiles functionality
 ipcMain.handle('fetch-github-repo-contents', async (event, { owner, repo, path = '' }) => {
   if (!fetch) return { success: false, error: 'Moduł fetch nie jest załadowany.' };
 
